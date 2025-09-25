@@ -975,11 +975,15 @@ export default function DashboardPage() {
         <div className="space-y-4">
             {/* Teacher-specific dashboard widgets */}
             {isTeacher && selectedSemester && selectedTeacher && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-                    <div className="lg:col-span-1">
-                        <TeacherStats processedSessions={processedSessions} weekStartDate={weekStart} />
+                <>
+                    {/* Welcome Section for Teachers */}
+                    <div className="mb-6">
+                        <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, {user?.name}!</h1>
+                        <p className="text-muted-foreground">Here's your teaching overview for this week</p>
                     </div>
-                    <div className="lg:col-span-1">
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                        <TeacherStats processedSessions={processedSessions} weekStartDate={weekStart} />
                         <QuickAttendance 
                             processedSessions={processedSessions} 
                             onUpdate={handleUpdate}
@@ -987,43 +991,66 @@ export default function DashboardPage() {
                             teacherName={selectedTeacher}
                             weekStartDate={weekStart}
                         />
-                    </div>
-                    <div className="lg:col-span-1">
                         <StudentProgress processedSessions={processedSessions} />
                     </div>
-                </div>
+
+                    {/* Teacher Tools Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <MessageCircle className="h-5 w-5" />
+                                    My Class Notes
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">Keep track of your observations and reminders</p>
+                            </CardHeader>
+                            <CardContent>
+                                <Textarea
+                                    placeholder="Add your class notes, observations, and reminders here..."
+                                    className="min-h-32 mb-4"
+                                    disabled
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                    Notes feature coming soon - requires database schema update
+                                </p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Star className="h-5 w-5" />
+                                    Quick Actions
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">Manage your classes efficiently</p>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <Button 
+                                    onClick={() => setIsDeleting(true)}
+                                    className="w-full justify-start text-destructive hover:text-destructive"
+                                    variant="outline"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Request Student Removal
+                                </Button>
+                                <Button 
+                                    onClick={handleExportCSV}
+                                    className="w-full justify-start"
+                                    variant="outline"
+                                >
+                                    <FileDown className="mr-2 h-4 w-4" />
+                                    Export My Schedule
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </>
             )}
 
-            {/* Teacher-specific tools row */}
-            {isTeacher && selectedSemester && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <MessageCircle className="h-5 w-5" />
-                                Class Notes
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Textarea
-                                placeholder="Add your class notes, observations, and reminders here..."
-                                className="min-h-32 mb-4"
-                                disabled
-                            />
-                            <p className="text-sm text-muted-foreground">
-                                Notes feature coming soon - requires database schema update
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <TeacherActionsCard 
-                        onRequestRemoval={() => setIsDeleting(true)}
-                        onExportCSV={handleExportCSV}
-                    />
-                </div>
-            )}
-
+            {/* Main Dashboard Header - Different for Admin vs Teacher */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <h1 className="text-2xl font-headline self-start">{t('dashboard.title')}</h1>
+                <h1 className="text-2xl font-headline self-start">
+                    {isTeacher ? 'My Teaching Schedule' : t('dashboard.title')}
+                </h1>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                     {isAdmin && (
                         <>
@@ -1043,11 +1070,6 @@ export default function DashboardPage() {
                                 <FileDown className="h-4 w-4 mr-2" /> {t('actions.exportCSV')}
                             </Button>
                         </>
-                    )}
-                    {isTeacher && (
-                        <Button variant="outline" className="w-full sm:w-auto text-destructive hover:text-destructive" onClick={() => setIsDeleting(true)}>
-                            <Trash2 className="h-4 w-4 mr-2" /> {t('actions.requestRemoval')}
-                        </Button>
                     )}
                 </div>
             </div>
