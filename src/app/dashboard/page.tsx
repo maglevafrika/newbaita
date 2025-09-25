@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, User, Hourglass, Calendar, ChevronLeft, ChevronRight, BarChart3, UserPlus, Upload, FileDown, Check, X, Clock, File, Trash2, GripVertical, FileText, MessageCircle, BookOpen, TrendingUp, CalendarPlus, Star, Bell, Award, Activity } from "lucide-react";
+import { Users, User, Hourglass, Calendar, ChevronLeft, ChevronRight, BarChart3, UserPlus, Upload, FileDown, Check, X, Clock, File, Trash2, GripVertical, FileText, MessageCircle, BookOpen, TrendingUp, CalendarPlus, Star } from "lucide-react";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Semester, SessionStudent, Session, ProcessedSession, StudentProfile, TeacherRequest, Leave, UserInDb } from "@/lib/types";
 import { useAuth } from "@/context/auth-context";
@@ -19,7 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Input } from "@/components/ui/input";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { addDays, format, startOfWeek, isWithinInterval, subDays, parseISO, isAfter, isBefore } from 'date-fns';
+import { addDays, format, startOfWeek, isWithinInterval, subDays } from 'date-fns';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTranslation } from 'react-i18next';
 import { Textarea } from "@/components/ui/textarea";
@@ -36,7 +36,35 @@ import { CreateSessionDialog } from "@/components/create-session-dialog";
 import { ImportStudentsDialog } from "@/components/import-students-dialog";
 import { DeleteStudentDialog } from "@/components/delete-student-dialog";
 
-// Enhanced Teacher Stats Component with better visual design
+interface ImportScheduleDialogProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const ImportScheduleDialog = ({
+  isOpen,
+  onOpenChange
+}: ImportScheduleDialogProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{t("importSchedule.title")}</DialogTitle>
+          <DialogDescription>
+            {t("importSchedule.description")}
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* CSV Upload Form */}
+        <ImportStudentsDialog isOpen={isOpen} onOpenChange={onOpenChange} />
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Teacher Statistics Component
 const TeacherStats = ({ processedSessions, weekStartDate }: { processedSessions: ProcessedSession[], weekStartDate: string }) => {
   const { t } = useTranslation();
   
@@ -77,58 +105,50 @@ const TeacherStats = ({ processedSessions, weekStartDate }: { processedSessions:
   }, [processedSessions]);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-blue-600" />
             <div>
-              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{stats.totalSessions}</p>
-              <p className="text-sm text-blue-700 dark:text-blue-300">Sessions This Week</p>
+              <p className="text-2xl font-bold">{stats.totalSessions}</p>
+              <p className="text-sm text-muted-foreground">Sessions</p>
             </div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
-            </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-green-600" />
             <div>
-              <p className="text-2xl font-bold text-green-900 dark:text-green-100">{stats.totalStudents}</p>
-              <p className="text-sm text-green-700 dark:text-green-300">Total Students</p>
+              <p className="text-2xl font-bold">{stats.totalStudents}</p>
+              <p className="text-sm text-muted-foreground">Students</p>
             </div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-purple-600" />
             <div>
-              <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{stats.attendanceRate}%</p>
-              <p className="text-sm text-purple-700 dark:text-purple-300">Attendance Rate</p>
+              <p className="text-2xl font-bold">{stats.attendanceRate}%</p>
+              <p className="text-sm text-muted-foreground">Attendance</p>
             </div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
-              <Check className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-green-600" />
             <div>
-              <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">{stats.presentStudents}</p>
-              <p className="text-sm text-amber-700 dark:text-amber-300">Present Today</p>
+              <p className="text-2xl font-bold">{stats.presentStudents}</p>
+              <p className="text-sm text-muted-foreground">Present</p>
             </div>
           </div>
         </CardContent>
@@ -137,112 +157,7 @@ const TeacherStats = ({ processedSessions, weekStartDate }: { processedSessions:
   );
 };
 
-// Enhanced Semester Timeline Component
-const SemesterTimeline = ({ semesters, selectedSemesterId, onSemesterChange }: { 
-  semesters: Semester[], 
-  selectedSemesterId: string | null,
-  onSemesterChange: (id: string) => void 
-}) => {
-  const { t } = useTranslation();
-  
-  // Add Fall Semester if not exists
-  const enhancedSemesters = useMemo(() => {
-    const existingSemesters = [...semesters];
-    
-    // Check if fall semester exists
-    const hasFallSemester = existingSemesters.some(s => 
-      s.name.toLowerCase().includes('fall') || s.name.toLowerCase().includes('autumn')
-    );
-    
-    if (!hasFallSemester) {
-      const fallSemester: Semester = {
-        id: 'fall-2024',
-        name: 'Fall Semester 2024',
-        startDate: '2024-09-01',
-        endDate: '2024-12-31',
-        teachers: [],
-        masterSchedule: {},
-        weeklyAttendance: {},
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isActive: false
-      };
-      existingSemesters.push(fallSemester);
-    }
-    
-    return existingSemesters.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-  }, [semesters]);
-
-  const currentDate = new Date();
-  
-  return (
-    <Card className="border-0 shadow-sm bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-indigo-900 dark:text-indigo-100">
-          <Calendar className="h-5 w-5" />
-          Academic Timeline
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="relative">
-          <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-indigo-200 dark:bg-indigo-800"></div>
-          <div className="space-y-4">
-            {enhancedSemesters.map((semester, index) => {
-              const isActive = isWithinInterval(currentDate, {
-                start: parseISO(semester.startDate),
-                end: parseISO(semester.endDate)
-              });
-              const isSelected = semester.id === selectedSemesterId;
-              const isPast = isBefore(parseISO(semester.endDate), currentDate);
-              const isFuture = isAfter(parseISO(semester.startDate), currentDate);
-              
-              return (
-                <div key={semester.id} className="relative flex items-center gap-4">
-                  <div className={cn(
-                    "w-8 h-8 rounded-full border-2 flex items-center justify-center relative z-10",
-                    isActive && "bg-green-500 border-green-500 text-white",
-                    isSelected && !isActive && "bg-indigo-500 border-indigo-500 text-white",
-                    !isActive && !isSelected && isPast && "bg-gray-300 border-gray-300 text-gray-600",
-                    !isActive && !isSelected && isFuture && "bg-blue-100 border-blue-300 text-blue-600"
-                  )}>
-                    {isActive && <Activity className="h-4 w-4" />}
-                    {!isActive && (isPast ? <Check className="h-4 w-4" /> : <Clock className="h-4 w-4" />)}
-                  </div>
-                  
-                  <div 
-                    className={cn(
-                      "flex-1 p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md",
-                      isSelected && "bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-600",
-                      !isSelected && "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750"
-                    )}
-                    onClick={() => onSemesterChange(semester.id || '')}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">{semester.name}</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {format(parseISO(semester.startDate), 'MMM dd')} - {format(parseISO(semester.endDate), 'MMM dd, yyyy')}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {isActive && <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>}
-                        {isSelected && !isActive && <Badge variant="secondary">Selected</Badge>}
-                        {isPast && !isSelected && <Badge variant="outline">Completed</Badge>}
-                        {isFuture && !isSelected && <Badge variant="outline" className="text-blue-600 border-blue-200">Upcoming</Badge>}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Enhanced Quick Attendance with better styling
+// Quick Attendance Component
 const QuickAttendance = ({ processedSessions, onUpdate, semester, teacherName, weekStartDate }: { 
   processedSessions: ProcessedSession[], 
   onUpdate: () => void,
@@ -282,82 +197,68 @@ const QuickAttendance = ({ processedSessions, onUpdate, semester, teacherName, w
 
   if (todaysSessions.length === 0) {
     return (
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
             Quick Attendance
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No sessions scheduled for today</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500">Enjoy your day off!</p>
-          </div>
+          <p className="text-muted-foreground text-center py-4">No sessions today</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-100">
-            <Clock className="h-5 w-5" />
-            Quick Attendance - Today
-          </div>
-          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">
-            {todaysSessions.length} Sessions
-          </Badge>
+        <CardTitle className="flex items-center gap-2">
+          <Clock className="h-5 w-5" />
+          Quick Attendance - Today
         </CardTitle>
       </CardHeader>
       <CardContent className="max-h-96 overflow-y-auto">
         <div className="space-y-4">
           {todaysSessions.map(session => (
-            <div key={session.id} className="bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 shadow-sm">
+            <div key={session.id} className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">{session.specialization}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{session.time}</p>
+                  <h4 className="font-medium">{session.specialization}</h4>
+                  <p className="text-sm text-muted-foreground">{session.time}</p>
                 </div>
-                <Badge variant={session.type === 'practical' ? 'default' : 'secondary'}>
-                  {session.type}
-                </Badge>
+                <Badge variant="outline">{session.type}</Badge>
               </div>
               
               <div className="space-y-2">
                 {session.students.map(student => (
-                  <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{student.name}</span>
+                  <div key={student.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                    <span className="text-sm font-medium">{student.name}</span>
                     <div className="flex gap-1">
                       <Button
                         size="sm"
                         variant={student.attendance === 'present' ? 'default' : 'outline'}
-                        className="h-8 px-3 bg-green-500 hover:bg-green-600 text-white border-green-500"
+                        className="h-7 px-2"
                         onClick={() => handleQuickAttendance(student.id, session.id, 'present')}
                       >
-                        <Check className="h-3 w-3 mr-1" />
-                        Present
+                        <Check className="h-3 w-3" />
                       </Button>
                       <Button
                         size="sm"
                         variant={student.attendance === 'absent' ? 'destructive' : 'outline'}
-                        className="h-8 px-3"
+                        className="h-7 px-2"
                         onClick={() => handleQuickAttendance(student.id, session.id, 'absent')}
                       >
-                        <X className="h-3 w-3 mr-1" />
-                        Absent
+                        <X className="h-3 w-3" />
                       </Button>
                       <Button
                         size="sm"
                         variant={student.attendance === 'late' ? 'secondary' : 'outline'}
-                        className="h-8 px-3"
+                        className="h-7 px-2"
                         onClick={() => handleQuickAttendance(student.id, session.id, 'late')}
                       >
-                        <Clock className="h-3 w-3 mr-1" />
-                        Late
+                        <Clock className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
@@ -371,7 +272,7 @@ const QuickAttendance = ({ processedSessions, onUpdate, semester, teacherName, w
   );
 };
 
-// Enhanced Student Progress with visual improvements
+// Student Progress Component
 const StudentProgress = ({ processedSessions }: { processedSessions: ProcessedSession[] }) => {
   const { t } = useTranslation();
   
@@ -398,56 +299,25 @@ const StudentProgress = ({ processedSessions }: { processedSessions: ProcessedSe
   }, [processedSessions]);
 
   return (
-    <Card className="border-0 shadow-sm bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/30 dark:to-pink-950/30">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-rose-900 dark:text-rose-100">
-            <Award className="h-5 w-5" />
-            Student Progress
-          </div>
-          <Badge className="bg-rose-100 text-rose-800 border-rose-200">
-            {studentStats.length} Students
-          </Badge>
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5" />
+          Student Progress
         </CardTitle>
       </CardHeader>
       <CardContent className="max-h-96 overflow-y-auto">
         <div className="space-y-4">
-          {studentStats.map((student, index) => (
-            <div key={student.name} className="bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-800 rounded-lg p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold",
-                    index === 0 && "bg-yellow-100 text-yellow-800 border-2 border-yellow-300",
-                    index === 1 && "bg-gray-100 text-gray-800 border-2 border-gray-300",
-                    index === 2 && "bg-orange-100 text-orange-800 border-2 border-orange-300",
-                    index > 2 && "bg-blue-100 text-blue-800"
-                  )}>
-                    {index + 1}
-                  </div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">{student.name}</h4>
-                </div>
-                <Badge variant={
-                  student.attendanceRate >= 90 ? 'default' : 
-                  student.attendanceRate >= 80 ? 'secondary' : 
-                  student.attendanceRate >= 70 ? 'outline' : 'destructive'
-                } className={cn(
-                  student.attendanceRate >= 90 && "bg-green-100 text-green-800 border-green-200",
-                  student.attendanceRate >= 80 && student.attendanceRate < 90 && "bg-blue-100 text-blue-800 border-blue-200"
-                )}>
+          {studentStats.map(student => (
+            <div key={student.name} className="border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium">{student.name}</h4>
+                <Badge variant={student.attendanceRate >= 80 ? 'default' : student.attendanceRate >= 60 ? 'secondary' : 'destructive'}>
                   {student.attendanceRate}%
                 </Badge>
               </div>
-              <Progress 
-                value={student.attendanceRate} 
-                className={cn(
-                  "mb-2",
-                  student.attendanceRate >= 80 && "[&>div]:bg-green-500",
-                  student.attendanceRate >= 60 && student.attendanceRate < 80 && "[&>div]:bg-yellow-500",
-                  student.attendanceRate < 60 && "[&>div]:bg-red-500"
-                )} 
-              />
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <Progress value={student.attendanceRate} className="mb-2" />
+              <p className="text-xs text-muted-foreground">
                 {student.present}/{student.total} sessions attended
               </p>
             </div>
@@ -458,70 +328,447 @@ const StudentProgress = ({ processedSessions }: { processedSessions: ProcessedSe
   );
 };
 
-// Leave Request Component
-const LeaveRequestCard = () => {
-  const [leaveReason, setLeaveReason] = useState('');
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
-  
+// Simplified Teacher Actions Component
+const TeacherActionsCard = ({ onRequestRemoval, onExportCSV }: { 
+  onRequestRemoval: () => void,
+  onExportCSV: () => void
+}) => {
   return (
-    <Card className="border-0 shadow-sm bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
-          <CalendarPlus className="h-5 w-5" />
-          Request Leave
+        <CardTitle className="flex items-center gap-2">
+          <Star className="h-5 w-5" />
+          Teacher Actions
         </CardTitle>
-        <p className="text-sm text-orange-700 dark:text-orange-300">Submit a leave request for approval</p>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Start Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left">
-                  {startDate ? format(startDate, 'PPP') : 'Select date'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <CalendarComponent mode="single" selected={startDate} onSelect={setStartDate} />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">End Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left">
-                  {endDate ? format(endDate, 'PPP') : 'Select date'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <CalendarComponent mode="single" selected={endDate} onSelect={setEndDate} />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-        <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Reason</label>
-          <Textarea 
-            placeholder="Please provide a reason for your leave request..."
-            value={leaveReason}
-            onChange={(e) => setLeaveReason(e.target.value)}
-            className="min-h-20"
-          />
-        </div>
-        <Button className="w-full bg-orange-500 hover:bg-orange-600">
-          <Bell className="mr-2 h-4 w-4" />
-          Submit Leave Request
+      <CardContent className="space-y-3">
+        <Button 
+          onClick={onRequestRemoval}
+          className="w-full justify-start text-destructive hover:text-destructive"
+          variant="outline"
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Request Student Removal
+        </Button>
+        <Button 
+          onClick={onExportCSV}
+          className="w-full justify-start"
+          variant="outline"
+        >
+          <FileDown className="mr-2 h-4 w-4" />
+          Export My Schedule
         </Button>
       </CardContent>
     </Card>
   );
 };
 
-// Your existing components with preserved functionality...
-// [Previous components remain unchanged for compatibility]
+const ScheduleGrid = ({ processedSessions, dayFilter, semester, teacherName, onUpdate, weekStartDate, studentLeaves }: { processedSessions: ProcessedSession[]; dayFilter: string; semester: Semester | undefined; teacherName: string; onUpdate: () => void; weekStartDate: string, studentLeaves: Leave[] }) => {
+  const { t } = useTranslation();
+  
+  // Define the day keys and their order
+  const allDaysKeys = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
+  
+  const isMobile = useIsMobile();
+  const days = isMobile && dayFilter.toLowerCase() !== 'all' ? [dayFilter] : allDaysKeys;
+  const timeSlots = Array.from({ length: 12 }, (_, i) => `${i + 10}:00`); // 10 AM to 9 PM (for slots ending at 10 PM)
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { updateSemester, addTeacherRequest, updateStudent, students: allStudents } = useDatabase();
+  
+  const [sessionToCreate, setSessionToCreate] = useState<{day: string, time: string} | null>(null);
+  const [sessionToDeleteFrom, setSessionToDeleteFrom] = useState<ProcessedSession | null>(null);
+
+  const handleUpdateAttendance = async (studentId: string, sessionId: string, day: string, status: SessionStudent['attendance']) => {
+      if (!semester || !user || !weekStartDate) return;
+      const attendancePath = `weeklyAttendance.${weekStartDate}.${teacherName}.${sessionId}.${studentId}`;
+      
+      const updatedWeeklyAttendance = JSON.parse(JSON.stringify(semester.weeklyAttendance || {}));
+      if (!updatedWeeklyAttendance[weekStartDate]) updatedWeeklyAttendance[weekStartDate] = {};
+      if (!updatedWeeklyAttendance[weekStartDate][teacherName]) updatedWeeklyAttendance[weekStartDate][teacherName] = {};
+      if (!updatedWeeklyAttendance[weekStartDate][teacherName][sessionId]) updatedWeeklyAttendance[weekStartDate][teacherName][sessionId] = {};
+      
+      updatedWeeklyAttendance[weekStartDate][teacherName][sessionId][studentId] = { status };
+      
+      try {
+          await updateSemester(semester.id || "", { weeklyAttendance: updatedWeeklyAttendance });
+          toast({ title: t('attendance.updated'), description: t('attendance.markedAs', { status: t(`attendance.${status}`) })});
+          onUpdate();
+      } catch (error) {
+          console.error('Error updating attendance:', error);
+          toast({ title: t('common.error'), description: t('attendance.updateFailed'), variant: "destructive" });
+      }
+  };
+
+  const handleRemoveStudent = async (student: SessionStudent, session: ProcessedSession) => {
+    if (!semester || !user) return;
+    const isTeacher = user?.activeRole === 'teacher';
+
+    try {
+        if (isTeacher) {
+            // Teacher requests removal
+            const request: Omit<TeacherRequest, 'id' | 'createdAt' | 'updatedAt'> = {
+                type: 'remove-student',
+                status: 'pending',
+                date: new Date().toISOString(),
+                teacherId: user.id,
+                teacherName: user.name,
+                details: {
+                    studentId: student.id,
+                    studentName: student.name,
+                    sessionId: session.id,
+                    sessionTime: session.time,
+                    day: session.day,
+                    reason: t('removal.teacherReason'),
+                    semesterId: semester.id || ""
+                }
+            };
+            
+            await addTeacherRequest(request);
+
+            // Also mark student as pending removal in master schedule
+            const masterSchedule = JSON.parse(JSON.stringify(semester.masterSchedule));
+            const daySessions = masterSchedule[teacherName]?.[session.day];
+            const sessionIndex = daySessions.findIndex((s: Session) => s.id === session.id);
+            if (sessionIndex > -1) {
+                const studentIndex = daySessions[sessionIndex].students.findIndex((s: SessionStudent) => s.id === student.id);
+                if (studentIndex > -1) {
+                    masterSchedule[teacherName][session.day][sessionIndex].students[studentIndex].pendingRemoval = true;
+                     await updateSemester(semester.id || "", { masterSchedule });
+                     toast({ title: t('removal.requested'), description: t('removal.requestSent', { studentName: student.name }) });
+                }
+            }
+        } else { // Admin directly removes
+            const masterSchedule = JSON.parse(JSON.stringify(semester.masterSchedule));
+            const daySessions = masterSchedule[teacherName]?.[session.day];
+            if (!daySessions) throw new Error(t('errors.daySessionsNotFound'));
+            const sessionIndex = daySessions.findIndex((s: Session) => s.id === session.id);
+            if(sessionIndex === -1) throw new Error(t('errors.sessionNotFound'));
+
+            masterSchedule[teacherName][session.day][sessionIndex].students = 
+                daySessions[sessionIndex].students.filter((s: SessionStudent) => s.id !== student.id);
+
+            const studentProfile = allStudents.find(s => s.id === student.id);
+            if (!studentProfile) throw new Error(t('errors.studentProfileNotFound'));
+
+            const updatedEnrolledIn = studentProfile.enrolledIn.filter(e => !(e.semesterId === semester.id && e.sessionId === session.id));
+            
+            await updateStudent(student.id, { enrolledIn: updatedEnrolledIn });
+            await updateSemester(semester.id || "", { masterSchedule });
+
+            toast({ title: t('removal.studentRemoved'), description: t('removal.removedFromSession', { studentName: student.name }) });
+        }
+        onUpdate();
+    } catch (error: any) {
+        toast({ title: t('common.error'), description: t('removal.processFailed', { message: error.message }), variant: 'destructive'});
+    }
+  };
+
+  const formatTimeForDisplay = (time: string) => {
+      const date = new Date(`1970-01-01T${time}:00`);
+      return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+  }
+
+  const filteredSessions = useMemo(() => {
+    if (dayFilter.toLowerCase() === 'all') return processedSessions;
+    return processedSessions.filter(s => s.day.toLowerCase() === dayFilter.toLowerCase());
+  }, [processedSessions, dayFilter])
+
+  // Updated function to get translated day name
+  const getDayName = (dayKey: string) => {
+    const dayMap: { [key: string]: string } = {
+      'Saturday': t('days.saturday'),
+      'Sunday': t('days.sunday'),
+      'Monday': t('days.monday'),
+      'Tuesday': t('days.tuesday'),
+      'Wednesday': t('days.wednesday'),
+      'Thursday': t('days.thursday')
+    };
+    return dayMap[dayKey] || dayKey;
+  };
+
+  if (isMobile && dayFilter.toLowerCase() === 'all' && filteredSessions.length > 0) {
+    return <Card className="mt-4"><CardContent className="p-4 text-center text-muted-foreground">{t('schedule.selectDayToView')}</CardContent></Card>;
+  }
+
+  if (!processedSessions || processedSessions.length === 0 || (isMobile && filteredSessions.length === 0 && dayFilter.toLowerCase() !== 'all')) {
+    return <Card className="mt-4"><CardContent className="p-4 text-center text-muted-foreground">{t('schedule.noScheduleAvailable')}</CardContent></Card>;
+  }
+
+  return (
+    <>
+    <div id="schedule-grid-container" className={cn("grid gap-px bg-border", isMobile ? "grid-cols-[auto_1fr]" : "grid-cols-[auto_repeat(6,_1fr)] -ml-4 -mr-4")}>
+      {/* Time Column */}
+      <div className="flex flex-col">
+        <div className="h-12 bg-background"></div>
+        {timeSlots.map(time => (
+            <div key={time} className="h-28 flex items-start justify-center bg-background pt-2 px-2 text-xs text-muted-foreground">
+                {formatTimeForDisplay(time)}
+            </div>
+        ))}
+      </div>
+
+      {/* Day Columns */}
+      {days.map((day) => day && (
+        <div key={day} className="relative col-span-1 bg-background">
+          <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm h-12 flex items-center justify-center font-semibold border-b">
+            {getDayName(day)}
+          </div>
+          <div className="space-y-px">
+             {timeSlots.map((time, index) => {
+               // Check if there's a session starting at this time slot
+               const sessionAtThisTime = filteredSessions.find(session => 
+                 session.day === day && session.startRow === index
+               );
+               
+               if (sessionAtThisTime) {
+                 // Render session card spanning multiple rows
+                 return (
+                   <div 
+                     key={`${day}-${time}`} 
+                     className="bg-background border-t group/cell relative p-1"
+                     style={{ minHeight: `${sessionAtThisTime.duration * 7}rem` }}
+                   >
+                     <Card className="w-full h-full flex flex-col shadow-sm bg-background border">
+                       <CardHeader className="p-3 pb-2">
+                           <div className="flex items-center justify-between">
+                               <div className="min-w-0 flex-1">
+                                   <p className="font-semibold text-sm leading-tight truncate">{sessionAtThisTime.specialization}</p>
+                                   <p className="text-xs text-muted-foreground">{sessionAtThisTime.time} - {sessionAtThisTime.endTime}</p>
+                               </div>
+                               <Badge variant="secondary" className="text-xs font-normal ml-2 flex-shrink-0">{sessionAtThisTime.type}</Badge>
+                           </div>
+                       </CardHeader>
+                       <CardContent className="p-3 pt-0 flex-grow flex flex-col overflow-hidden">
+                           <Separator className="mb-2"/>
+                           <div className="flex-grow overflow-y-auto">
+                               {sessionAtThisTime.students && sessionAtThisTime.students.length > 0 ? (
+                                   <div className="space-y-2">
+                                       {sessionAtThisTime.students.map((student: SessionStudent) => {
+                                           const isOnLeave = studentLeaves.some(l => l.personId === student.id);
+                                           const attendance = isOnLeave ? 'excused' : student.attendance;
+
+                                           return (
+                                               <div key={student.id} className={cn(
+                                                   "flex justify-between items-center p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors group/student",
+                                                   student.pendingRemoval && "opacity-50 bg-destructive/10"
+                                               )}>
+                                                   <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                       <User className="h-3 w-3 shrink-0 text-muted-foreground" />
+                                                       <span className="text-xs font-medium truncate">{student.name}</span>
+                                                       {student.pendingRemoval && (
+                                                           <Badge variant="destructive" className="text-[9px] px-1 py-0 h-auto">
+                                                               <Hourglass className="h-2 w-2 mr-1" />
+                                                               Pending
+                                                           </Badge>
+                                                       )}
+                                                       {isOnLeave && (
+                                                           <Badge variant="outline" className="text-[9px] px-1 py-0 h-auto">
+                                                               Leave
+                                                           </Badge>
+                                                       )}
+                                                   </div>
+                                                   <div className="flex items-center gap-1 shrink-0">
+                                                       {/* Attendance Status Indicator */}
+                                                       <div className={cn(
+                                                           "w-2 h-2 rounded-full flex-shrink-0",
+                                                           attendance === 'present' && "bg-green-500",
+                                                           attendance === 'absent' && "bg-red-500",
+                                                           attendance === 'late' && "bg-amber-500",
+                                                           attendance === 'excused' && "bg-blue-500",
+                                                           !attendance && "bg-gray-300"
+                                                       )} />
+
+                                                       {/* Attendance Popover */}
+                                                       <Popover>
+                                                           <PopoverTrigger asChild>
+                                                               <Button
+                                                                   variant="ghost"
+                                                                   size="icon"
+                                                                   className="h-5 w-5 opacity-0 group-hover/student:opacity-100 transition-opacity hover:bg-background flex-shrink-0"
+                                                                   title="Mark Attendance"
+                                                               >
+                                                                   <GripVertical className="h-2.5 w-2.5" />
+                                                               </Button>
+                                                           </PopoverTrigger>
+                                                           <PopoverContent className="w-auto p-1" align="end">
+                                                               <div className="flex gap-1">
+                                                                   <Button
+                                                                       onClick={() => handleUpdateAttendance(student.id, sessionAtThisTime.id, day, 'present')}
+                                                                       variant="ghost"
+                                                                       size="icon"
+                                                                       className="h-6 w-6 hover:bg-green-50"
+                                                                       title="Present"
+                                                                   >
+                                                                       <Check className="h-3 w-3 text-green-600" />
+                                                                   </Button>
+                                                                   <Button
+                                                                       onClick={() => handleUpdateAttendance(student.id, sessionAtThisTime.id, day, 'absent')}
+                                                                       variant="ghost"
+                                                                       size="icon"
+                                                                       className="h-6 w-6 hover:bg-red-50"
+                                                                       title="Absent"
+                                                                   >
+                                                                       <X className="h-3 w-3 text-red-600" />
+                                                                   </Button>
+                                                                   <Button
+                                                                       onClick={() => handleUpdateAttendance(student.id, sessionAtThisTime.id, day, 'late')}
+                                                                       variant="ghost"
+                                                                       size="icon"
+                                                                       className="h-6 w-6 hover:bg-amber-50"
+                                                                       title="Late"
+                                                                   >
+                                                                       <Clock className="h-3 w-3 text-amber-600" />
+                                                                   </Button>
+                                                                   <Button
+                                                                       onClick={() => handleUpdateAttendance(student.id, sessionAtThisTime.id, day, 'excused')}
+                                                                       variant="ghost"
+                                                                       size="icon"
+                                                                       className="h-6 w-6 hover:bg-blue-50"
+                                                                       title="Excused"
+                                                                   >
+                                                                       <File className="h-3 w-3 text-blue-600" />
+                                                                   </Button>
+                                                               </div>
+                                                           </PopoverContent>
+                                                       </Popover>
+
+                                                       {/* Delete Button */}
+                                                       <Button
+                                                           onClick={() => handleRemoveStudent(student, sessionAtThisTime)}
+                                                           variant="ghost"
+                                                           size="icon"
+                                                           className="h-5 w-5 opacity-0 group-hover/student:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+                                                           title={t('actions.removeFromSession', { name: student.name })}
+                                                       >
+                                                           <Trash2 className="h-2.5 w-2.5" />
+                                                       </Button>
+                                                   </div>
+                                               </div>
+                                           )
+                                       })}
+                                   </div>
+                               ) : (
+                                   <div className="flex-grow flex items-center justify-center py-4">
+                                       <div className="text-center">
+                                           <User className="h-6 w-6 mx-auto text-muted-foreground/50 mb-2" />
+                                           <p className="text-xs text-muted-foreground">{t('schedule.noStudentsEnrolled')}</p>
+                                       </div>
+                                   </div>
+                               )}
+                           </div>
+                       </CardContent>
+                       {semester && (
+                           <CardFooter className="p-2 border-t bg-background/50">
+                               <div className="flex w-full gap-1">
+                                   <AddStudentDialog session={sessionAtThisTime} semester={semester} teacherName={teacherName} onStudentAdded={onUpdate} asChild>
+                                       <Button variant="ghost" size="sm" className={cn("h-7 text-xs font-normal", sessionAtThisTime.students && sessionAtThisTime.students.length > 0 ? "flex-1" : "w-full", "text-muted-foreground hover:text-foreground")}>
+                                           <UserPlus className="mr-1 h-3 w-3" /> {t('actions.enrollStudent')}
+                                       </Button>
+                                   </AddStudentDialog>
+                                   {sessionAtThisTime.students && sessionAtThisTime.students.length > 0 && (
+                                       <Button 
+                                           variant="ghost" 
+                                           size="sm" 
+                                           className="flex-1 h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 font-normal"
+                                           onClick={() => setSessionToDeleteFrom(sessionAtThisTime)}
+                                       >
+                                           <Trash2 className="mr-1 h-3 w-3" /> {t('actions.removeStudent')}
+                                       </Button>
+                                   )}
+                               </div>
+                           </CardFooter>
+                       )}
+                     </Card>
+                   </div>
+                 );
+               } else {
+                 // Check if this slot is occupied by a multi-row session from above
+                 const occupyingSession = filteredSessions.find(session => 
+                   session.day === day && 
+                   session.startRow < index && 
+                   session.startRow + session.duration > index
+                 );
+                 
+                 if (occupyingSession) {
+                   // This slot is occupied by a session that started earlier, skip it
+                   return null;
+                 }
+                 
+                 // Render empty time slot
+                 return (
+                   <div key={`${day}-${time}`} className="h-28 bg-background border-t group/cell relative">
+                       <Button 
+                           variant="ghost" 
+                           size="icon" 
+                           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 rounded-full opacity-0 group-hover/cell:opacity-100 transition-opacity z-10"
+                           onClick={() => setSessionToCreate({ day, time: formatTimeForDisplay(time) })}
+                       >
+                           <UserPlus className="h-4 w-4 text-muted-foreground" />
+                       </Button>
+                   </div>
+                 );
+               }
+             })}
+          </div>
+        </div>
+      ))}
+    </div>
+     {sessionToCreate && semester && (
+        <CreateSessionDialog
+            isOpen={!!sessionToCreate}
+            onOpenChange={() => setSessionToCreate(null)}
+            day={sessionToCreate.day}
+            time={sessionToCreate.time}
+            semester={semester}
+            teacherName={teacherName}
+            onSessionCreated={onUpdate}
+        />
+     )}
+     {sessionToDeleteFrom && semester && (
+        <Dialog open={!!sessionToDeleteFrom} onOpenChange={() => setSessionToDeleteFrom(null)}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{t('actions.removeStudent')}</DialogTitle>
+                    <DialogDescription>
+                        {t('removal.selectStudentFromSession')}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {sessionToDeleteFrom.students.map((sessionStudent) => {
+                        const fullStudent = allStudents.find(s => s.id === sessionStudent.id);
+                        if (!fullStudent) return null;
+                        
+                        return (
+                            <div key={sessionStudent.id} className="flex items-center justify-between p-3 border rounded-lg">
+                                <div className="flex items-center gap-3">
+                                    <User className="h-4 w-4 text-muted-foreground" />
+                                    <div>
+                                        <p className="font-medium">{sessionStudent.name}</p>
+                                        <p className="text-sm text-muted-foreground">{fullStudent.level}</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => {
+                                        handleRemoveStudent(sessionStudent, sessionToDeleteFrom);
+                                        setSessionToDeleteFrom(null);
+                                    }}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    {t('actions.remove')}
+                                </Button>
+                            </div>
+                        );
+                    })}
+                </div>
+            </DialogContent>
+        </Dialog>
+     )}
+    </>
+  );
+};
 
 export default function DashboardPage() {
     const { user, users } = useAuth();
@@ -724,157 +971,90 @@ export default function DashboardPage() {
     
     const weekEnd = addDays(new Date(weekStart), 5);
     
-    const ScheduleGrid = ({ processedSessions, dayFilter, semester, teacherName, onUpdate, weekStartDate, studentLeaves }: { processedSessions: ProcessedSession[]; dayFilter: string; semester: Semester | undefined; teacherName: string; onUpdate: () => void; weekStartDate: string, studentLeaves: Leave[] }) => {
-  const { t } = useTranslation();
-  
-  // Define the day keys and their order
-  const allDaysKeys = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
-  
-  const isMobile = useIsMobile();
-  const days = isMobile && dayFilter.toLowerCase() !== 'all' ? [dayFilter] : allDaysKeys;
-  const timeSlots = Array.from({ length: 12 }, (_, i) => `${i + 10}:00`); // 10 AM to 9 PM (for slots ending at 10 PM)
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const { updateSemester, addTeacherRequest, updateStudent, students: allStudents } = useDatabase();
-  
-  const [sessionToCreate, setSessionToCreate] = useState<{day: string, time: string} | null>(null);
-  const [sessionToDeleteFrom, setSessionToDeleteFrom] = useState<ProcessedSession | null>(null);
-
-  const handleUpdateAttendance = async (studentId: string, sessionId: string, day: string, status: SessionStudent['attendance']) => {
-      if (!semester || !user || !weekStartDate) return;
-      const attendancePath = `weeklyAttendance.${weekStartDate}.${teacherName}.${sessionId}.${studentId}`;
-      
-      const updatedWeeklyAttendance = JSON.parse(JSON.stringify(semester.weeklyAttendance || {}));
-      if (!updatedWeeklyAttendance[weekStartDate]) updatedWeeklyAttendance[weekStartDate] = {};
-      if (!updatedWeeklyAttendance[weekStartDate][teacherName]) updatedWeeklyAttendance[weekStartDate][teacherName] = {};
-      if (!updatedWeeklyAttendance[weekStartDate][teacherName][sessionId]) updatedWeeklyAttendance[weekStartDate][teacherName][sessionId] = {};
-      
-      updatedWeeklyAttendance[weekStartDate][teacherName][sessionId][studentId] = { status };
-      
-      try {
-          await updateSemester(semester.id || "", { weeklyAttendance: updatedWeeklyAttendance });
-          toast({ title: t('attendance.updated'), description: t('attendance.markedAs', { status: t(`attendance.${status}`) })});
-          onUpdate();
-      } catch (error) {
-          console.error('Error updating attendance:', error);
-          toast({ title: t('common.error'), description: t('attendance.updateFailed'), variant: "destructive" });
-      }
-  };
     return (
-        <div className="space-y-6 p-6 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 min-h-screen">
-            {/* Enhanced Teacher Dashboard */}
+        <div className="space-y-4">
+            {/* Teacher-specific dashboard widgets */}
             {isTeacher && selectedSemester && selectedTeacher && (
                 <>
-                    {/* Hero Welcome Section */}
-                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-8 text-white shadow-2xl">
-                        <div className="absolute inset-0 bg-black/10"></div>
-                        <div className="relative z-10">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h1 className="text-4xl font-bold mb-2">Welcome back, {user?.name}! 👋</h1>
-                                    <p className="text-blue-100 text-lg">Ready to inspire minds and shape futures today?</p>
-                                    <div className="flex items-center gap-4 mt-4">
-                                        <Badge className="bg-white/20 text-white border-white/30">
-                                            Week of {format(new Date(weekStart), 'MMM dd')}
-                                        </Badge>
-                                        <Badge className="bg-white/20 text-white border-white/30">
-                                            {processedSessions.length} Sessions Scheduled
-                                        </Badge>
-                                    </div>
-                                </div>
-                                <div className="hidden md:block">
-                                    <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                                        <BookOpen className="w-16 h-16 text-white/80" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    {/* Welcome Section for Teachers */}
+                    <div className="mb-6">
+                        <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, {user?.name}!</h1>
+                        <p className="text-muted-foreground">Here's your teaching overview for this week</p>
                     </div>
 
-                    {/* Enhanced Stats Grid */}
-                    <TeacherStats processedSessions={processedSessions} weekStartDate={weekStart} />
-
-                    {/* Main Dashboard Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Quick Attendance - Full width on mobile, 2/3 on desktop */}
-                        <div className="lg:col-span-2">
-                            <QuickAttendance 
-                                processedSessions={processedSessions} 
-                                onUpdate={handleUpdate}
-                                semester={selectedSemester}
-                                teacherName={selectedTeacher}
-                                weekStartDate={weekStart}
-                            />
-                        </div>
-                        
-                        {/* Student Progress */}
-                        <div className="lg:col-span-1">
-                            <StudentProgress processedSessions={processedSessions} />
-                        </div>
-                    </div>
-
-                    {/* Secondary Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Semester Timeline */}
-                        <SemesterTimeline 
-                            semesters={semestersState}
-                            selectedSemesterId={selectedSemesterId}
-                            onSemesterChange={setSelectedSemesterId}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                        <TeacherStats processedSessions={processedSessions} weekStartDate={weekStart} />
+                        <QuickAttendance 
+                            processedSessions={processedSessions} 
+                            onUpdate={handleUpdate}
+                            semester={selectedSemester}
+                            teacherName={selectedTeacher}
+                            weekStartDate={weekStart}
                         />
-                        
-                        {/* Leave Request */}
-                        <LeaveRequestCard />
+                        <StudentProgress processedSessions={processedSessions} />
                     </div>
 
-                    {/* Personal Teaching Statistics Card */}
-                    <Card className="border-0 shadow-lg bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-violet-900 dark:text-violet-100">
-                                <BarChart3 className="h-6 w-6" />
-                                Personal Teaching Statistics
-                            </CardTitle>
-                            <p className="text-violet-700 dark:text-violet-300">Your teaching performance insights</p>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="text-center">
-                                    <div className="w-16 h-16 bg-violet-100 dark:bg-violet-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <Users className="h-8 w-8 text-violet-600 dark:text-violet-400" />
-                                    </div>
-                                    <p className="text-2xl font-bold text-violet-900 dark:text-violet-100">
-                                        {processedSessions.reduce((acc, session) => acc + session.students.length, 0)}
-                                    </p>
-                                    <p className="text-sm text-violet-700 dark:text-violet-300">Total Students This Week</p>
-                                </div>
-                                <div className="text-center">
-                                    <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
-                                    </div>
-                                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                                        {Math.round(processedSessions.reduce((acc, session) => {
-                                            const totalStudents = session.students.length;
-                                            const presentStudents = session.students.filter(s => s.attendance === 'present' || s.attendance === 'late').length;
-                                            return totalStudents > 0 ? acc + (presentStudents / totalStudents) : acc;
-                                        }, 0) / (processedSessions.length || 1) * 100)}%
-                                    </p>
-                                    <p className="text-sm text-green-700 dark:text-green-300">Average Attendance Rate</p>
-                                </div>
-                                <div className="text-center">
-                                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <Clock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                                    </div>
-                                    <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                                        {processedSessions.reduce((acc, session) => acc + session.duration, 0)}h
-                                    </p>
-                                    <p className="text-sm text-blue-700 dark:text-blue-300">Total Teaching Hours</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    {/* Teacher Tools Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <MessageCircle className="h-5 w-5" />
+                                    My Class Notes
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">Keep track of your observations and reminders</p>
+                            </CardHeader>
+                            <CardContent>
+                                <Textarea
+                                    placeholder="Add your class notes, observations, and reminders here..."
+                                    className="min-h-32 mb-4"
+                                    disabled
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                    Notes feature coming soon - requires database schema update
+                                </p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Star className="h-5 w-5" />
+                                    Quick Actions
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">Manage your classes efficiently</p>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <Button 
+                                    onClick={() => setIsEnrolling(true)}
+                                    className="w-full justify-start"
+                                    variant="outline"
+                                >
+                                    <UserPlus className="mr-2 h-4 w-4" />
+                                    Enroll Student in My Classes
+                                </Button>
+                                <Button 
+                                    onClick={() => setIsDeleting(true)}
+                                    className="w-full justify-start text-destructive hover:text-destructive"
+                                    variant="outline"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Request Student Removal
+                                </Button>
+                                <Button 
+                                    onClick={handleExportCSV}
+                                    className="w-full justify-start"
+                                    variant="outline"
+                                >
+                                    <FileDown className="mr-2 h-4 w-4" />
+                                    Export My Schedule
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </>
             )}
 
-            {/* Admin Dashboard Header */}
+            {/* Main Dashboard Header - Different for Admin vs Teacher */}
             {!isTeacher && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <h1 className="text-2xl font-headline self-start">{t('dashboard.title')}</h1>
@@ -902,30 +1082,24 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {/* Teacher Schedule Header */}
+            {/* Teacher-specific schedule header */}
             {isTeacher && (
-                <div className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border-l-4 border-blue-500">
-                    <div>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">My Teaching Schedule</h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Click on students to mark attendance or manage enrollment</p>
-                    </div>
-                    <div className="hidden md:block">
-                        <Calendar className="h-8 w-8 text-blue-500" />
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold">My Teaching Schedule</h2>
+                    <div className="text-sm text-muted-foreground">
+                        Click on students to mark attendance or manage enrollment
                     </div>
                 </div>
             )}
             
-            {/* Schedule Controls Card - Enhanced */}
-            <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
-                <CardContent className="p-6 flex flex-col xl:flex-row xl:items-center gap-4">
+            <Card>
+                <CardContent className="p-4 flex flex-col xl:flex-row xl:items-center gap-4">
                     {isAdmin && (
                         <>
-                            <div className="w-full xl:w-auto flex items-center gap-3">
-                                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                                    <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                </div>
+                            <div className="w-full xl:w-auto flex items-center gap-2">
+                                <BarChart3 className="w-5 h-5 text-muted-foreground" />
                                 <Select value={selectedSemesterId || ""} onValueChange={setSelectedSemesterId}>
-                                  <SelectTrigger className="w-full xl:w-[200px]">
+                                  <SelectTrigger className="w-full xl:w-[180px]">
                                     <SelectValue placeholder={t('dashboard.selectSemester')} />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -933,12 +1107,10 @@ export default function DashboardPage() {
                                   </SelectContent>
                                 </Select>
                             </div>
-                            <div className="w-full xl:w-auto flex items-center gap-3">
-                                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                                    <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
-                                </div>
-                                <Select value={selectedTeacher} onValueChange={setSelectedTeacher} disabled={!selectedSemesterId || availableTeachers.length === 0}>
-                                  <SelectTrigger className="w-full xl:w-[200px]">
+                            <div className="w-full xl:w-auto flex items-center gap-2">
+                                 <Users className="w-5 h-5 text-muted-foreground" />
+                                 <Select value={selectedTeacher} onValueChange={setSelectedTeacher} disabled={!selectedSemesterId || availableTeachers.length === 0}>
+                                  <SelectTrigger className="w-full xl:w-[180px]">
                                     <SelectValue placeholder={t('dashboard.selectTeacher')} />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -948,13 +1120,11 @@ export default function DashboardPage() {
                             </div>
                         </>
                     )}
-                     <div className="w-full xl:w-auto flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                            <CalendarIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                        </div>
+                     <div className="w-full xl:w-auto flex items-center gap-2">
+                        <CalendarIcon className="w-5 h-5 text-muted-foreground" />
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full xl:w-[260px] justify-start text-left font-normal">
+                                <Button variant="outline" className="w-full xl:w-[240px] justify-start text-left font-normal">
                                     <span>{format(new Date(weekStart), 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}</span>
                                 </Button>
                             </PopoverTrigger>
@@ -963,27 +1133,26 @@ export default function DashboardPage() {
                             </PopoverContent>
                         </Popover>
                         <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setSelectedDate(addDays(selectedDate!, -7))}><ChevronLeft /></Button>
-                            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setSelectedDate(addDays(selectedDate!, 7))}><ChevronRight /></Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(addDays(selectedDate!, -7))}><ChevronLeft /></Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(addDays(selectedDate!, 7))}><ChevronRight /></Button>
                         </div>
                     </div>
                     <div className="w-full xl:w-auto flex items-center gap-2 xl:ml-auto">
                          <Tabs value={dayFilter} onValueChange={setDayFilter} className="w-full md:w-auto">
-                            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 bg-gray-100 dark:bg-gray-800">
-                                <TabsTrigger value="All" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">{t('days.all')}</TabsTrigger>
-                                <TabsTrigger value="Saturday" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">{t('days.satShort')}</TabsTrigger>
-                                <TabsTrigger value="Sunday" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">{t('days.sunShort')}</TabsTrigger>
-                                <TabsTrigger value="Monday" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">{t('days.monShort')}</TabsTrigger>
-                                <TabsTrigger value="Tuesday" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">{t('days.tueShort')}</TabsTrigger>
-                                <TabsTrigger value="Wednesday" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">{t('days.wedShort')}</TabsTrigger>
-                                <TabsTrigger value="Thursday" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">{t('days.thuShort')}</TabsTrigger>
+                            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7">
+                                <TabsTrigger value="All">{t('days.all')}</TabsTrigger>
+                                <TabsTrigger value="Saturday">{t('days.satShort')}</TabsTrigger>
+                                <TabsTrigger value="Sunday">{t('days.sunShort')}</TabsTrigger>
+                                <TabsTrigger value="Monday">{t('days.monShort')}</TabsTrigger>
+                                <TabsTrigger value="Tuesday">{t('days.tueShort')}</TabsTrigger>
+                                <TabsTrigger value="Wednesday">{t('days.wedShort')}</TabsTrigger>
+                                <TabsTrigger value="Thursday">{t('days.thuShort')}</TabsTrigger>
                             </TabsList>
                          </Tabs>
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Schedule Grid */}
             <div className="overflow-x-auto">
                 {isTeacherOnLeave ? (
                      <Card><CardContent className="p-6 text-center text-muted-foreground">{t('schedule.onLeaveMessage')}</CardContent></Card>
@@ -1002,7 +1171,6 @@ export default function DashboardPage() {
                 )}
             </div>
 
-            {/* Dialogs */}
              {selectedSemester && (
                 <>
                     <EnrollStudentDialog 
@@ -1013,6 +1181,7 @@ export default function DashboardPage() {
                         teachers={users.filter(u => u.roles.includes('teacher'))}
                         onEnrollmentSuccess={handleUpdate}
                     />
+                    {/* You need to select a single student to delete; here is an example using the first student */}
                     <DeleteStudentDialog
                         isOpen={isDeleting}
                         onOpenChange={setIsDeleting}
@@ -1020,7 +1189,7 @@ export default function DashboardPage() {
                     />
                 </>
             )}
+            <ImportScheduleDialog isOpen={isImporting} onOpenChange={setIsImporting} />
         </div>
     );
-}
 }
