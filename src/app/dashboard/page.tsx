@@ -1083,113 +1083,121 @@ export default function DashboardPage() {
             )}
 
             {/* Teacher-specific schedule header */}
-            {isTeacher && (
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">My Teaching Schedule</h2>
-                    <div className="text-sm text-muted-foreground">
-                        Click on students to mark attendance or manage enrollment
-                    </div>
+{isTeacher && (
+    <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">My Teaching Schedule</h2>
+        <div className="text-sm text-muted-foreground">
+            Click on students to mark attendance or manage enrollment
+        </div>
+    </div>
+)}
+
+<Card>
+    <CardContent className="p-4 flex flex-col xl:flex-row xl:items-center gap-4">
+        {/* Semester and Teacher Selectors - Show for both Admin and Teacher */}
+        <div className="w-full xl:w-auto flex flex-col sm:flex-row gap-4">
+            {/* Semester Selector */}
+            <div className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-muted-foreground" />
+                <Select value={selectedSemesterId || ""} onValueChange={setSelectedSemesterId}>
+                    <SelectTrigger className="w-full xl:w-[180px]">
+                        <SelectValue placeholder={isAdmin ? t('dashboard.selectSemester') : "Select Semester"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {semestersState.map(s => <SelectItem key={s.id} value={s.id || ""}>{s.name}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+            </div>
+            
+            {/* Teacher Selector - Only for Admin */}
+            {isAdmin && (
+                <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-muted-foreground" />
+                    <Select value={selectedTeacher} onValueChange={setSelectedTeacher} disabled={!selectedSemesterId || availableTeachers.length === 0}>
+                        <SelectTrigger className="w-full xl:w-[180px]">
+                            <SelectValue placeholder={t('dashboard.selectTeacher')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {availableTeachers.map(t => <SelectItem key={t.id} value={t.name || ""}>{t.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
                 </div>
             )}
-            
-            <Card>
-                <CardContent className="p-4 flex flex-col xl:flex-row xl:items-center gap-4">
-                    {isAdmin && (
-                        <>
-                            <div className="w-full xl:w-auto flex items-center gap-2">
-                                <BarChart3 className="w-5 h-5 text-muted-foreground" />
-                                <Select value={selectedSemesterId || ""} onValueChange={setSelectedSemesterId}>
-                                  <SelectTrigger className="w-full xl:w-[180px]">
-                                    <SelectValue placeholder={t('dashboard.selectSemester')} />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {semestersState.map(s => <SelectItem key={s.id} value={s.id || ""}>{s.name}</SelectItem>)}
-                                  </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="w-full xl:w-auto flex items-center gap-2">
-                                 <Users className="w-5 h-5 text-muted-foreground" />
-                                 <Select value={selectedTeacher} onValueChange={setSelectedTeacher} disabled={!selectedSemesterId || availableTeachers.length === 0}>
-                                  <SelectTrigger className="w-full xl:w-[180px]">
-                                    <SelectValue placeholder={t('dashboard.selectTeacher')} />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {availableTeachers.map(t => <SelectItem key={t.id} value={t.name || ""}>{t.name}</SelectItem>)}
-                                  </SelectContent>
-                                </Select>
-                            </div>
-                        </>
-                    )}
-                     <div className="w-full xl:w-auto flex items-center gap-2">
-                        <CalendarIcon className="w-5 h-5 text-muted-foreground" />
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full xl:w-[240px] justify-start text-left font-normal">
-                                    <span>{format(new Date(weekStart), 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}</span>
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <CalendarComponent mode="single" selected={selectedDate || undefined} onSelect={(date) => date && setSelectedDate(date)} initialFocus/>
-                            </PopoverContent>
-                        </Popover>
-                        <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(addDays(selectedDate!, -7))}><ChevronLeft /></Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(addDays(selectedDate!, 7))}><ChevronRight /></Button>
-                        </div>
-                    </div>
-                    <div className="w-full xl:w-auto flex items-center gap-2 xl:ml-auto">
-                         <Tabs value={dayFilter} onValueChange={setDayFilter} className="w-full md:w-auto">
-                            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7">
-                                <TabsTrigger value="All">{t('days.all')}</TabsTrigger>
-                                <TabsTrigger value="Saturday">{t('days.satShort')}</TabsTrigger>
-                                <TabsTrigger value="Sunday">{t('days.sunShort')}</TabsTrigger>
-                                <TabsTrigger value="Monday">{t('days.monShort')}</TabsTrigger>
-                                <TabsTrigger value="Tuesday">{t('days.tueShort')}</TabsTrigger>
-                                <TabsTrigger value="Wednesday">{t('days.wedShort')}</TabsTrigger>
-                                <TabsTrigger value="Thursday">{t('days.thuShort')}</TabsTrigger>
-                            </TabsList>
-                         </Tabs>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <div className="overflow-x-auto">
-                {isTeacherOnLeave ? (
-                     <Card><CardContent className="p-6 text-center text-muted-foreground">{t('schedule.onLeaveMessage')}</CardContent></Card>
-                ) : selectedTeacher ? (
-                    <ScheduleGrid 
-                        processedSessions={processedSessions} 
-                        dayFilter={dayFilter} 
-                        semester={selectedSemester}
-                        teacherName={selectedTeacher}
-                        onUpdate={handleUpdate}
-                        weekStartDate={weekStart}
-                        studentLeaves={studentLeavesForWeek}
-                    />
-                ) : (
-                    <Card><CardContent className="p-6 text-center text-muted-foreground">{isAdmin ? t('schedule.selectTeacherMessage') : 'Loading your schedule...'}</CardContent></Card>
-                )}
-            </div>
-
-             {selectedSemester && (
-                <>
-                    <EnrollStudentDialog 
-                        isOpen={isEnrolling} 
-                        onOpenChange={setIsEnrolling} 
-                        students={students}
-                        semester={selectedSemester}
-                        teachers={users.filter(u => u.roles.includes('teacher'))}
-                        onEnrollmentSuccess={handleUpdate}
-                    />
-                    {/* You need to select a single student to delete; here is an example using the first student */}
-                    <DeleteStudentDialog
-                        isOpen={isDeleting}
-                        onOpenChange={setIsDeleting}
-                        student={students[0]}
-                    />
-                </>
-            )}
-            <ImportScheduleDialog isOpen={isImporting} onOpenChange={setIsImporting} />
         </div>
+
+        {/* Date Range Selector */}
+        <div className="w-full xl:w-auto flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-muted-foreground" />
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full xl:w-[240px] justify-start text-left font-normal">
+                        <span>{format(new Date(weekStart), 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}</span>
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent mode="single" selected={selectedDate || undefined} onSelect={(date) => date && setSelectedDate(date)} initialFocus/>
+                </PopoverContent>
+            </Popover>
+            <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(addDays(selectedDate!, -7))}><ChevronLeft /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(addDays(selectedDate!, 7))}><ChevronRight /></Button>
+            </div>
+        </div>
+        
+        {/* Day Filter Tabs */}
+        <div className="w-full xl:w-auto flex items-center gap-2 xl:ml-auto">
+            <Tabs value={dayFilter} onValueChange={setDayFilter} className="w-full md:w-auto">
+                <TabsList className="grid w-full grid-cols-4 md:grid-cols-7">
+                    <TabsTrigger value="All">{t('days.all')}</TabsTrigger>
+                    <TabsTrigger value="Saturday">{t('days.satShort')}</TabsTrigger>
+                    <TabsTrigger value="Sunday">{t('days.sunShort')}</TabsTrigger>
+                    <TabsTrigger value="Monday">{t('days.monShort')}</TabsTrigger>
+                    <TabsTrigger value="Tuesday">{t('days.tueShort')}</TabsTrigger>
+                    <TabsTrigger value="Wednesday">{t('days.wedShort')}</TabsTrigger>
+                    <TabsTrigger value="Thursday">{t('days.thuShort')}</TabsTrigger>
+                </TabsList>
+            </Tabs>
+        </div>
+    </CardContent>
+</Card>
+
+<div className="overflow-x-auto">
+    {isTeacherOnLeave ? (
+        <Card><CardContent className="p-6 text-center text-muted-foreground">{t('schedule.onLeaveMessage')}</CardContent></Card>
+    ) : selectedTeacher ? (
+        <ScheduleGrid 
+            processedSessions={processedSessions} 
+            dayFilter={dayFilter} 
+            semester={selectedSemester}
+            teacherName={selectedTeacher}
+            onUpdate={handleUpdate}
+            weekStartDate={weekStart}
+            studentLeaves={studentLeavesForWeek}
+        />
+    ) : (
+        <Card><CardContent className="p-6 text-center text-muted-foreground">{isAdmin ? t('schedule.selectTeacherMessage') : 'Loading your schedule...'}</CardContent></Card>
+    )}
+</div>
+
+{selectedSemester && (
+    <>
+        <EnrollStudentDialog 
+            isOpen={isEnrolling} 
+            onOpenChange={setIsEnrolling} 
+            students={students}
+            semester={selectedSemester}
+            teachers={users.filter(u => u.roles.includes('teacher'))}
+            onEnrollmentSuccess={handleUpdate}
+        />
+        {/* You need to select a single student to delete; here is an example using the first student */}
+        <DeleteStudentDialog
+            isOpen={isDeleting}
+            onOpenChange={setIsDeleting}
+            student={students[0]}
+        />
+    </>
+)}
+<ImportScheduleDialog isOpen={isImporting} onOpenChange={setIsImporting} />
+</div>
     );
 }
