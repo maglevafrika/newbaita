@@ -64,7 +64,7 @@ export const ImportScheduleDialog = ({
   );
 };
 
-// Teacher Statistics Component - Optimized for Big Screens
+// Teacher Statistics Component
 const TeacherStats = ({ processedSessions, weekStartDate }: { processedSessions: ProcessedSession[], weekStartDate: string }) => {
   const { t } = useTranslation();
   
@@ -105,58 +105,50 @@ const TeacherStats = ({ processedSessions, weekStartDate }: { processedSessions:
   }, [processedSessions]);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-      <Card className="lg:hover:shadow-lg transition-shadow duration-200">
-        <CardContent className="p-4 lg:p-6">
-          <div className="flex items-center gap-3 lg:gap-4">
-            <div className="p-2 lg:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <BookOpen className="h-5 w-5 lg:h-6 lg:w-6 text-blue-600 dark:text-blue-400" />
-            </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-blue-600" />
             <div>
-              <p className="text-2xl lg:text-3xl font-bold text-foreground">{stats.totalSessions}</p>
-              <p className="text-sm lg:text-base text-muted-foreground font-medium">Sessions</p>
+              <p className="text-2xl font-bold">{stats.totalSessions}</p>
+              <p className="text-sm text-muted-foreground">Sessions</p>
             </div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="lg:hover:shadow-lg transition-shadow duration-200">
-        <CardContent className="p-4 lg:p-6">
-          <div className="flex items-center gap-3 lg:gap-4">
-            <div className="p-2 lg:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <Users className="h-5 w-5 lg:h-6 lg:w-6 text-green-600 dark:text-green-400" />
-            </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-green-600" />
             <div>
-              <p className="text-2xl lg:text-3xl font-bold text-foreground">{stats.totalStudents}</p>
-              <p className="text-sm lg:text-base text-muted-foreground font-medium">Students</p>
+              <p className="text-2xl font-bold">{stats.totalStudents}</p>
+              <p className="text-sm text-muted-foreground">Students</p>
             </div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="lg:hover:shadow-lg transition-shadow duration-200">
-        <CardContent className="p-4 lg:p-6">
-          <div className="flex items-center gap-3 lg:gap-4">
-            <div className="p-2 lg:p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <TrendingUp className="h-5 w-5 lg:h-6 lg:w-6 text-purple-600 dark:text-purple-400" />
-            </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-purple-600" />
             <div>
-              <p className="text-2xl lg:text-3xl font-bold text-foreground">{stats.attendanceRate}%</p>
-              <p className="text-sm lg:text-base text-muted-foreground font-medium">Attendance</p>
+              <p className="text-2xl font-bold">{stats.attendanceRate}%</p>
+              <p className="text-sm text-muted-foreground">Attendance</p>
             </div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="lg:hover:shadow-lg transition-shadow duration-200">
-        <CardContent className="p-4 lg:p-6">
-          <div className="flex items-center gap-3 lg:gap-4">
-            <div className="p-2 lg:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <Check className="h-5 w-5 lg:h-6 lg:w-6 text-green-600 dark:text-green-400" />
-            </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-green-600" />
             <div>
-              <p className="text-2xl lg:text-3xl font-bold text-foreground">{stats.presentStudents}</p>
-              <p className="text-sm lg:text-base text-muted-foreground font-medium">Present</p>
+              <p className="text-2xl font-bold">{stats.presentStudents}</p>
+              <p className="text-sm text-muted-foreground">Present</p>
             </div>
           </div>
         </CardContent>
