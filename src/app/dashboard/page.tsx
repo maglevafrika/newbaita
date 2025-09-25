@@ -1025,6 +1025,14 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 <Button 
+                                    onClick={() => setIsEnrolling(true)}
+                                    className="w-full justify-start"
+                                    variant="outline"
+                                >
+                                    <UserPlus className="mr-2 h-4 w-4" />
+                                    Enroll Student in My Classes
+                                </Button>
+                                <Button 
                                     onClick={() => setIsDeleting(true)}
                                     className="w-full justify-start text-destructive hover:text-destructive"
                                     variant="outline"
@@ -1047,32 +1055,42 @@ export default function DashboardPage() {
             )}
 
             {/* Main Dashboard Header - Different for Admin vs Teacher */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <h1 className="text-2xl font-headline self-start">
-                    {isTeacher ? 'My Teaching Schedule' : t('dashboard.title')}
-                </h1>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                    {isAdmin && (
-                        <>
-                            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setIsEnrolling(true)}>
-                                <UserPlus className="h-4 w-4 mr-2" /> {t('actions.enrollStudent')}
-                            </Button>
-                            <Button variant="outline" className="w-full sm:w-auto text-destructive hover:text-destructive" onClick={() => setIsDeleting(true)}>
-                                <Trash2 className="h-4 w-4 mr-2" /> {t('actions.removeStudent')}
-                            </Button>
-                            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setIsImporting(true)}>
-                                <Upload className="h-4 w-4 mr-2" /> {t('actions.import')}
-                            </Button>
-                            <Button variant="outline" className="w-full sm:w-auto" onClick={handleExportPDF}>
-                                <FileText className="h-4 w-4 mr-2" /> {t('actions.exportPDF')}
-                            </Button>
-                            <Button variant="outline" className="w-full sm:w-auto" onClick={handleExportCSV}>
-                                <FileDown className="h-4 w-4 mr-2" /> {t('actions.exportCSV')}
-                            </Button>
-                        </>
-                    )}
+            {!isTeacher && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <h1 className="text-2xl font-headline self-start">{t('dashboard.title')}</h1>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                        {isAdmin && (
+                            <>
+                                <Button variant="outline" className="w-full sm:w-auto" onClick={() => setIsEnrolling(true)}>
+                                    <UserPlus className="h-4 w-4 mr-2" /> {t('actions.enrollStudent')}
+                                </Button>
+                                <Button variant="outline" className="w-full sm:w-auto text-destructive hover:text-destructive" onClick={() => setIsDeleting(true)}>
+                                    <Trash2 className="h-4 w-4 mr-2" /> {t('actions.removeStudent')}
+                                </Button>
+                                <Button variant="outline" className="w-full sm:w-auto" onClick={() => setIsImporting(true)}>
+                                    <Upload className="h-4 w-4 mr-2" /> {t('actions.import')}
+                                </Button>
+                                <Button variant="outline" className="w-full sm:w-auto" onClick={handleExportPDF}>
+                                    <FileText className="h-4 w-4 mr-2" /> {t('actions.exportPDF')}
+                                </Button>
+                                <Button variant="outline" className="w-full sm:w-auto" onClick={handleExportCSV}>
+                                    <FileDown className="h-4 w-4 mr-2" /> {t('actions.exportCSV')}
+                                </Button>
+                            </>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
+
+            {/* Teacher-specific schedule header */}
+            {isTeacher && (
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold">My Teaching Schedule</h2>
+                    <div className="text-sm text-muted-foreground">
+                        Click on students to mark attendance or manage enrollment
+                    </div>
+                </div>
+            )}
             
             <Card>
                 <CardContent className="p-4 flex flex-col xl:flex-row xl:items-center gap-4">
@@ -1149,7 +1167,7 @@ export default function DashboardPage() {
                         studentLeaves={studentLeavesForWeek}
                     />
                 ) : (
-                    <Card><CardContent className="p-6 text-center text-muted-foreground">{t('schedule.selectTeacherMessage')}</CardContent></Card>
+                    <Card><CardContent className="p-6 text-center text-muted-foreground">{isAdmin ? t('schedule.selectTeacherMessage') : 'Loading your schedule...'}</CardContent></Card>
                 )}
             </div>
 
