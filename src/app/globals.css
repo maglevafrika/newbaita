@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  font-family: 'PT Sans', sans-serif;
+}
+@layer base {
+  :root {
+    --background: 35 71% 94%; /* Light Parchment */
+    --foreground: 25 55% 25%; /* Dark Brown */
+   
+    --card: 35 65% 98%; /* Lighter Parchment */
+    --card-foreground: 25 55% 25%;
+    --popover: 35 65% 98%;
+    --popover-foreground: 25 55% 25%;
+    --primary: 25 56% 40%; /* Rich Brown */
+    --primary-foreground: 35 71% 94%;
+    --secondary: 30 35% 65%; /* Muted Brown */
+    --secondary-foreground: 25 55% 25%;
+    --muted: 35 50% 90%;
+    --muted-foreground: 30 35% 45%;
+    --accent: 30 35% 85%;
+    --accent-foreground: 25 55% 25%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 35 71% 94%;
+    --border: 30 35% 80%;
+    --input: 30 35% 80%;
+    --ring: 25 56% 40%;
+    --radius: 0.5rem;
+    /* Chart Colors */
+    --chart-1: 160 70% 40%; /* Teal */
+    --chart-2: 30 80% 55%; /* Orange */
+    --chart-3: 260 70% 50%; /* Purple */
+    /* Sidebar Colors */
+    --sidebar: 25 55% 22%; /* Dark Wood Brown */
+    --sidebar-foreground: 35 71% 88%;
+    --sidebar-border: 25 55% 28%;
+    --sidebar-accent: 25 56% 35%;
+    --sidebar-accent-foreground: 35 71% 94%;
+    --sidebar-ring: 25 56% 45%;
+  }
+  .dark {
+    --background: 25 55% 10%; /* Darkest Wood */
+    --foreground: 35 71% 88%; /* Light Parchment Text */
+    --card: 25 55% 15%; /* Darker Wood Card */
+    --card-foreground: 35 71% 88%;
+   
+    --popover: 25 55% 10%;
+    --popover-foreground: 35 71% 88%;
+    --primary: 35 66% 60%; /* Lighter, Rich Gold-Brown for Dark Mode */
+    --primary-foreground: 25 55% 10%;
+    --secondary: 30 35% 30%; /* Darker Muted Brown */
+    --secondary-foreground: 35 71% 88%;
+    --muted: 25 55% 18%;
+    --muted-foreground: 35 71% 70%;
+    --accent: 30 35% 25%;
+    --accent-foreground: 35 71% 90%;
+   
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 35 71% 94%;
+    --border: 25 55% 20%;
+    --input: 25 55% 20%;
+    --ring: 35 66% 60%;
+    /* Chart Colors */
+    --chart-1: 160 80% 60%; /* Brighter Teal */
+    --chart-2: 30 90% 65%; /* Brighter Orange */
+    --chart-3: 260 80% 70%; /* Brighter Purple */
+    /* Sidebar Colors - Dark */
+    --sidebar: 25 55% 8%;
+    --sidebar-foreground: 35 71% 88%;
+    --sidebar-border: 25 55% 12%;
+    --sidebar-accent: 25 56% 35%;
+    --sidebar-accent-foreground: 35 71% 94%;
+    --sidebar-ring: 25 56% 45%;
+  }
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+.font-headline {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+}
+
+/* RTL Support for Arabic - COMMENTED OUT TO PREVENT LAYOUT ISSUES */
+/*
+.rtl {
+  direction: rtl;
+}
+.rtl .flex {
+  flex-direction: row-reverse;
+}
+.rtl .text-left {
+  text-align: right;
+}
+.rtl .text-right {
+  text-align: left;
+}
+.rtl .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+.rtl .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+.rtl .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+.rtl .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+.rtl [data-radix-popper-content-wrapper] {
+  transform-origin: right center;
+}
+.rtl .dropdown-menu-item svg:first-child {
+  margin-right: 0;
+  margin-left: 0.5rem;
+  order: 2;
+}
+.rtl .dropdown-menu-item span {
+  order: 1;
+}
+.rtl .sidebar {
+  right: 0;
+  left: auto;
+}
+.rtl .main-content {
+  margin-right: 240px;
+  margin-left: 0;
+}
+*/
